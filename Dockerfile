@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # 暴露端口
-EXPOSE 4173
+EXPOSE 5173
 
 # 启动应用
-CMD ["npm", "run", "preview", "--", "--host"]
+CMD ["npm", "run", "preview", "--", "--host", "--port", "5173"]

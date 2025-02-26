@@ -9,7 +9,7 @@ fi
 # 设置变量
 REPO_URL="https://github.com/rapRabbit/admin.git"
 PROJECT_DIR="/home/hoyiping128/admin"
-NGINX_CONTAINER="my-site"
+NGINX_CONTAINER="admin"
 
 # 如果目录不存在则克隆，存在则拉取最新代码
 if [ ! -d "$PROJECT_DIR" ]; then

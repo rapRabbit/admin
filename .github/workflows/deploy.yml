@@ -41,8 +41,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/my-site:latest
-            ${{ secrets.DOCKER_USERNAME }}/my-site:${{ github.sha }}
+            ${{ secrets.DOCKER_USERNAME }}/admin:latest
+            ${{ secrets.DOCKER_USERNAME }}/admin:${{ github.sha }}
         
       # 登录到服务器并部署
       - name: Deploy to Server
@@ -62,11 +62,11 @@ jobs:
             
             # 拉取新镜像
             echo "拉取新镜像..."
-            docker pull ${{ secrets.DOCKER_USERNAME }}/my-site:latest || { echo "拉取镜像失败"; exit 1; }
+            docker pull ${{ secrets.DOCKER_USERNAME }}/admin:latest || { echo "拉取镜像失败"; exit 1; }
             
             # 使用 Docker Compose 启动服务
             echo "启动服务..."
-            cd ~/my-site  # 确保指定正确的目录路径
+            cd ~/admin  # 确保指定正确的目录路径
             docker-compose down
             docker-compose up -d
             
