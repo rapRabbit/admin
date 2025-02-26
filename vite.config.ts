@@ -10,8 +10,16 @@ export default defineConfig({
       '@': resolve(__dirname, 'src')
     }
   },
+  preview: {
+    host: true,
+    port: 5173,
+    strictPort: true,
+    allowedHosts: true
+  },
   server: {
-    port: 8080,
+    host: true,
+    port: 5173,
+    strictPort: true,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
