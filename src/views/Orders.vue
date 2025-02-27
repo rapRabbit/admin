@@ -13,8 +13,8 @@
     </div>
 
     <el-table :data="filteredOrders" v-loading="loading">
-      <el-table-column prop="id" label="订单号" width="220" />
-      <el-table-column prop="user.name" label="用户" />
+      <el-table-column prop="_id" label="订单号" width="220" />
+      <el-table-column prop="user" label="用户" />
       <el-table-column prop="totalAmount" label="金额">
         <template #default="{ row }">
           ¥{{ row.totalAmount.toFixed(2) }}
@@ -50,7 +50,7 @@
 
     <el-dialog
       v-model="dialogVisible"
-      :title="'订单详情 #' + currentOrder?.id"
+      :title="'订单详情 #' + currentOrder?._id"
       width="60%"
     >
       <template v-if="currentOrder">
@@ -126,7 +126,7 @@ interface OrderItem {
 }
 
 interface Order {
-  id: string;
+  _id: string;
   user: {
     id: string;
     name: string;
@@ -190,7 +190,7 @@ const handleView = (order: Order) => {
 
 const handleShip = async (order: Order) => {
   try {
-    await axios.post(`/api/orders/${order.id}/ship`);
+    await axios.put(`/api/orders/${order._id}/ship`);
     ElMessage.success('发货成功');
     fetchOrders();
   } catch (error) {

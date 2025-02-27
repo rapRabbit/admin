@@ -78,7 +78,7 @@ import axios from 'axios';
 import { ElMessage } from 'element-plus';
 
 interface Product {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   price: number;
@@ -132,8 +132,9 @@ const handleEdit = (product: Product) => {
 
 const handleSave = async () => {
   try {
-    if (form.value.id) {
-      await axios.put(`/api/products/${form.value.id}`, form.value);
+    if (form.value._id) {
+      
+      await axios.put(`/api/products/${form.value._id}`, form.value);
       ElMessage.success('更新成功');
     } else {
       await axios.post('/api/products', form.value);
@@ -147,8 +148,13 @@ const handleSave = async () => {
 };
 
 const handleToggleStatus = async (product: Product) => {
+  console.debug(product)
   try {
-    await axios.patch(`/api/products/${product.id}/toggle-status`);
+    if (product.isActive) {
+      await axios.put(`/api/products/${product._id}/deactivate`);
+    } else {
+      await axios.put(`/api/products/${product._id}/activate`);
+    }
     ElMessage.success(product.isActive ? '下架成功' : '上架成功');
     fetchProducts();
   } catch (error) {

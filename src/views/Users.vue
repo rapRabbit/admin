@@ -162,7 +162,8 @@ const fetchUsers = async () => {
 
 const handleView = async (user: User) => {
   try {
-    const { data } = await axios.get(`/api/users/${user.id}/stats`);
+    console.debug(user)
+    const { data } = await axios.get(`/api/users/${user._id}`);
     currentUser.value = { ...user, stats: data };
     dialogVisible.value = true;
   } catch (error) {
@@ -172,7 +173,7 @@ const handleView = async (user: User) => {
 
 const handleToggleStatus = async (user: User) => {
   try {
-    await axios.patch(`/api/users/${user.id}/toggle-status`);
+    await axios.patch(`/api/users/${user._id}`);
     ElMessage.success(user.isActive ? '用户已禁用' : '用户已启用');
     fetchUsers();
   } catch (error) {

@@ -21,7 +21,7 @@ export const useUserStore = defineStore('user', {
   actions: {
     async login(email: string, password: string) {
       try {
-        const { data } = await axios.post('/api/user/auth/login', { email, password });
+        const { data } = await axios.post('/api/auth/login', { email, password });
         this.token = data.token;
         this.userInfo = data.user;
         localStorage.setItem('token', data.token);
