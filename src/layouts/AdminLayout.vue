@@ -28,7 +28,7 @@
     <el-container>
       <el-header>
         <div class="header-content">
-          <h2>电商管理后台</h2>
+          <h2>管理后台</h2>
           <el-dropdown @command="handleCommand">
             <span class="user-info">
               {{ userStore.userInfo?.name }}
