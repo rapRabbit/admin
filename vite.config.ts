@@ -1,30 +1,42 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
-export default defineConfig({
-  plugins: [vue()],
-  base: '/admin/',
-  resolve: {
-    alias: {
-      '@': resolve(__dirname, 'src')
-    }
-  },
-  preview: {
-    host: true,
-    port: 5173,
-    strictPort: true,
-    allowedHosts: true
-  },
-  server: {
-    host: '0.0.0.0',
-    port: 5173,
-    strictPort: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:3000',
-        changeOrigin: true
+export default defineConfig(({ mode }) => {
+  // 加载环境变量
+  const env = loadEnv(mode, process.cwd())
+  console.debug(env)
+  console.debug(mode)
+  const isProd = mode === 'production'
+
+  return {
+    plugins: [vue()],
+    base: env.VITE_BASE_URL,
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src')
+      }
+    },
+    define: {
+      // 定义全局常量
+      __APP_ENV__: JSON.stringify(env.VITE_PUBLIC_PATH)
+    },
+    preview: {
+      host: true,
+      port: 5173,
+      strictPort: true,
+      allowedHosts: true
+    },
+    server: {
+      host: '0.0.0.0',
+      port: 5173,
+      strictPort: true,
+      proxy: {
+        '/api': {
+          target: env.VITE_API_BASE,
+          changeOrigin: true
+        }
       }
     }
   }
-}) 
+})

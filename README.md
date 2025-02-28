@@ -4,5 +4,5 @@ npm run dev
 # 打包
 npm run build
 
-# 部署
-./deploy.sh
+# 线上
+npm run preview
