@@ -2,9 +2,9 @@ import request from '@/utils/request'
 
 // 用户相关接口
 export const userApi = {
-  login: (data: any) => request.post('/user/login', data),
-  getInfo: () => request.get('/user/info'),
-  logout: () => request.post('/user/logout'),
+  login: (data: any) => request.post('/auth/login', data),
+  getInfo: () => request.get('/user'),
+  logout: () => request.post('/auth/logout'),
   list: (params: any) => request.get('/users', { params }),
   detail: (id: string) => request.get(`/users/${id}`),
   activate: (id: string) => request.put(`/users/${id}/activate`),

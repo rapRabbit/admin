@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { userApi } from '@/api';
+import axios from 'axios';
 
 interface UserInfo {
   id: string;
@@ -19,12 +20,19 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
-    async login(username: string, password: string) {
+    async login(email: string, password: string) {
       try {
-        const { data } = await userApi.login({ username, password });
+        const data  = await userApi.login({ email, password });
+        console.debug(data);
+        
+        // 保存token
         this.token = data.token;
         localStorage.setItem('token', data.token);
-        return data;
+        
+        // 设置全局默认请求头
+        axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+        
+        return data.user;
       } catch (error) {
         console.error('登录失败', error);
         throw error;
@@ -35,6 +43,9 @@ export const useUserStore = defineStore('user', {
       this.token = '';
       this.userInfo = {} as UserInfo;
       localStorage.removeItem('token');
+      
+      // 清除全局默认请求头
+      delete axios.defaults.headers.common['Authorization'];
     },
 
     async getUserInfo() {

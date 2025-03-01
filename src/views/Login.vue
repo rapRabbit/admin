@@ -41,9 +41,11 @@ const handleLogin = async () => {
   loading.value = true;
   try {
     await userStore.login(form.value.email, form.value.password);
+    ElMessage.success('登录成功');
     router.push('/dashboard');
   } catch (error: any) {
-    ElMessage.error(error.message || '登录失败');
+    console.error('登录失败:', error);
+    ElMessage.error(error.message || '登录失败，请检查账号密码');
   } finally {
     loading.value = false;
   }
