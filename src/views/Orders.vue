@@ -103,8 +103,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
-import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import { orderApi } from '@/api';
 
 interface Address {
   name: string;
@@ -149,6 +149,7 @@ const orderStatuses = [
   { value: 'paid', label: '已付款', type: 'success' },
   { value: 'shipped', label: '已发货', type: 'primary' },
   { value: 'delivered', label: '已送达', type: 'info' },
+  { value: 'completed', label: '已完成', type: 'success' },
   { value: 'cancelled', label: '已取消', type: 'danger' }
 ];
 
@@ -157,14 +158,14 @@ const filteredOrders = computed(() => {
   return orders.value.filter(order => order.status === statusFilter.value);
 });
 
-const getStatusType = (status: string) => {
-  const statusObj = orderStatuses.find(s => s.value === status);
-  return statusObj ? statusObj.type : 'info';
+const getStatusLabel = (status: string) => {
+  const found = orderStatuses.find(s => s.value === status);
+  return found ? found.label : status;
 };
 
-const getStatusLabel = (status: string) => {
-  const statusObj = orderStatuses.find(s => s.value === status);
-  return statusObj ? statusObj.label : status;
+const getStatusType = (status: string): 'warning' | 'success' | 'primary' | 'info' | 'danger' => {
+  const found = orderStatuses.find(s => s.value === status);
+  return found ? found.type as 'warning' | 'success' | 'primary' | 'info' | 'danger' : 'info';
 };
 
 const formatAddress = (address: Address) => {
@@ -174,7 +175,7 @@ const formatAddress = (address: Address) => {
 const fetchOrders = async () => {
   loading.value = true;
   try {
-    const { data } = await axios.get('/api/orders');
+    const { data } = await orderApi.list({});
     orders.value = data;
   } catch (error) {
     ElMessage.error('获取订单列表失败');
@@ -183,18 +184,23 @@ const fetchOrders = async () => {
   }
 };
 
-const handleView = (order: Order) => {
-  currentOrder.value = order;
-  dialogVisible.value = true;
+const handleView = async (order: Order) => {
+  try {
+    const { data } = await orderApi.detail(order._id);
+    currentOrder.value = data;
+    dialogVisible.value = true;
+  } catch (error) {
+    ElMessage.error('获取订单详情失败');
+  }
 };
 
 const handleShip = async (order: Order) => {
   try {
-    await axios.put(`/api/orders/${order._id}/ship`);
-    ElMessage.success('发货成功');
+    await orderApi.update(order._id, { status: 'shipped' });
+    ElMessage.success('订单已发货');
     fetchOrders();
   } catch (error) {
-    ElMessage.error('发货失败');
+    ElMessage.error('操作失败');
   }
 };
 

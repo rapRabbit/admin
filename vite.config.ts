@@ -3,12 +3,9 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
 export default defineConfig(({ mode }) => {
-  // 加载环境变量
   const env = loadEnv(mode, process.cwd())
-  console.debug(env)
-  console.debug(mode)
   const isProd = mode === 'production'
-
+  
   return {
     plugins: [vue()],
     base: env.VITE_BASE_URL,
@@ -19,7 +16,8 @@ export default defineConfig(({ mode }) => {
     },
     define: {
       // 定义全局常量
-      __APP_ENV__: JSON.stringify(env.VITE_PUBLIC_PATH)
+      __APP_ENV__: JSON.stringify(env.VITE_PUBLIC_PATH),
+      'process.env.NODE_ENV': JSON.stringify(mode)
     },
     preview: {
       host: true,

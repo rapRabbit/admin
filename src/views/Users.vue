@@ -113,8 +113,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { Search } from '@element-plus/icons-vue';
-import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import { userApi } from '@/api';
 
 interface UserStats {
   totalOrders: number;
@@ -150,9 +150,8 @@ const filteredUsers = computed(() => {
 const fetchUsers = async () => {
   loading.value = true;
   try {
-    const { data } = await axios.get('/api/users');
-    console.debug(data.data.list)
-    users.value = data.data.list;
+    const { data } = await userApi.list({});
+    users.value = data;
   } catch (error) {
     ElMessage.error('获取用户列表失败');
   } finally {
@@ -162,9 +161,8 @@ const fetchUsers = async () => {
 
 const handleView = async (user: User) => {
   try {
-    console.debug(user)
-    const { data } = await axios.get(`/api/users/${user._id}`);
-    currentUser.value = { ...user, stats: data };
+    const { data } = await userApi.detail(user._id);
+    currentUser.value = data;
     dialogVisible.value = true;
   } catch (error) {
     ElMessage.error('获取用户详情失败');
@@ -173,8 +171,12 @@ const handleView = async (user: User) => {
 
 const handleToggleStatus = async (user: User) => {
   try {
-    await axios.patch(`/api/users/${user._id}`);
-    ElMessage.success(user.isActive ? '用户已禁用' : '用户已启用');
+    if (user.isActive) {
+      await userApi.deactivate(user._id);
+    } else {
+      await userApi.activate(user._id);
+    }
+    ElMessage.success(user.isActive ? '禁用成功' : '启用成功');
     fetchUsers();
   } catch (error) {
     ElMessage.error('操作失败');

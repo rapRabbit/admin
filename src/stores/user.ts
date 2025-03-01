@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import axios from 'axios';
+import { userApi } from '@/api';
 
 interface UserInfo {
   id: string;
@@ -10,8 +10,8 @@ interface UserInfo {
 
 export const useUserStore = defineStore('user', {
   state: () => ({
+    userInfo: {} as UserInfo,
     token: localStorage.getItem('token') || '',
-    userInfo: null as UserInfo | null,
   }),
 
   getters: {
@@ -19,23 +19,33 @@ export const useUserStore = defineStore('user', {
   },
 
   actions: {
-    async login(email: string, password: string) {
+    async login(username: string, password: string) {
       try {
-        const { data } = await axios.post('/api/auth/login', { email, password });
+        const { data } = await userApi.login({ username, password });
         this.token = data.token;
-        this.userInfo = data.user;
         localStorage.setItem('token', data.token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-      } catch (error: any) {
-        throw new Error(error.response?.data?.message || '登录失败');
+        return data;
+      } catch (error) {
+        console.error('登录失败', error);
+        throw error;
       }
     },
 
     logout() {
       this.token = '';
-      this.userInfo = null;
+      this.userInfo = {} as UserInfo;
       localStorage.removeItem('token');
-      delete axios.defaults.headers.common['Authorization'];
+    },
+
+    async getUserInfo() {
+      try {
+        const { data } = await userApi.getInfo();
+        this.userInfo = data;
+        return data;
+      } catch (error) {
+        console.error('获取用户信息失败', error);
+        throw error;
+      }
     },
   },
 }); 

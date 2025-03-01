@@ -37,7 +37,7 @@
 
     <el-dialog
       v-model="dialogVisible"
-      :title="form.id ? '编辑商品' : '添加商品'"
+      :title="form._id ? '编辑商品' : '添加商品'"
       width="50%"
     >
       <el-form :model="form" label-width="80px">
@@ -74,8 +74,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import { productApi } from '@/api';
 
 interface Product {
   _id: string;
@@ -92,19 +92,19 @@ const loading = ref(false);
 const dialogVisible = ref(false);
 const categories = ref(['电子产品', '服装', '食品', '图书']);
 
-const form = ref({
-  id: '',
+const form = ref<Partial<Product>>({
+  _id: '',
   name: '',
   description: '',
   price: 0,
   stock: 0,
-  categories: [] as string[]
+  categories: []
 });
 
 const fetchProducts = async () => {
   loading.value = true;
   try {
-    const { data } = await axios.get('/api/products');
+    const { data } = await productApi.list({});
     products.value = data;
   } catch (error) {
     ElMessage.error('获取商品列表失败');
@@ -115,7 +115,7 @@ const fetchProducts = async () => {
 
 const handleAdd = () => {
   form.value = {
-    id: '',
+    _id: '',
     name: '',
     description: '',
     price: 0,
@@ -133,27 +133,25 @@ const handleEdit = (product: Product) => {
 const handleSave = async () => {
   try {
     if (form.value._id) {
-      
-      await axios.put(`/api/products/${form.value._id}`, form.value);
+      await productApi.update(form.value._id, form.value);
       ElMessage.success('更新成功');
     } else {
-      await axios.post('/api/products', form.value);
+      await productApi.create(form.value);
       ElMessage.success('添加成功');
     }
     dialogVisible.value = false;
     fetchProducts();
   } catch (error) {
-    ElMessage.error(form.value.id ? '更新失败' : '添加失败');
+    ElMessage.error(form.value._id ? '更新失败' : '添加失败');
   }
 };
 
 const handleToggleStatus = async (product: Product) => {
-  console.debug(product)
   try {
     if (product.isActive) {
-      await axios.put(`/api/products/${product._id}/deactivate`);
+      await productApi.deactivate(product._id);
     } else {
-      await axios.put(`/api/products/${product._id}/activate`);
+      await productApi.activate(product._id);
     }
     ElMessage.success(product.isActive ? '下架成功' : '上架成功');
     fetchProducts();

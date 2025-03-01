@@ -5,16 +5,7 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 import 'element-plus/dist/index.css';
 import App from './App.vue';
 import router from './router';
-import axios from 'axios';
-
-// 配置 axios 默认值
-axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-// 从 localStorage 获取 token
-const token = localStorage.getItem('token');
-if (token) {
-  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-}
+import * as api from './api';
 
 const app = createApp(App);
 
@@ -22,6 +13,9 @@ const app = createApp(App);
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
 }
+
+// 全局挂载 API
+app.config.globalProperties.$api = api;
 
 app.use(createPinia());
 app.use(router);
